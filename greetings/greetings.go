@@ -20,13 +20,25 @@ func Hello(name string) (string, error) {
 	return message, nil
 }
 
+func Hellos(names []string) (map[string]string, error) {
+	messages := make(map[string]string)
+	for _, name := range names {
+		message, err := Hello(name)
+		if err != nil {
+			return nil, err
+		}
+		messages[name] = message
+	}
+	return messages, nil
+}
+
 // randomly return msg from set of greeting msgs
 func randomFormat() string {
 	// a slice of msg formats
 	formats := []string{
-		"Hi, %v Welcome!",
-		"What's going on %v",
-		"everything fine %v bro",
+		"Hi, %v Welcome!,",
+		"What's going on %v,",
+		"everything fine %v bro,",
 	}
 
 	// use random index for slice of formats

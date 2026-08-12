@@ -14,7 +14,7 @@ func main() {
 
 	fmt.Println("Hello, world!") // fmt.Println, prints to stdout
 
-	message, err := greetings.Hello("arora")
+	message, err := greetings.Hellos([]string{"arora", "soumya", "jay", "akshika"})
 	// if error returned than print it to console and exit program
 	if err != nil {
 		log.Fatal(err)
