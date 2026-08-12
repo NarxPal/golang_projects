@@ -16,7 +16,12 @@ func Hello(name string) (string, error) {
 	// if name is provided than
 	// Return a greeting that embeds the name in a message.
 	// create msg using random Format
+
 	message := fmt.Sprintf(randomFormat(), name)
+
+	// TEST PURPOSE : don't use name to show test error
+	// message := fmt.Sprint(randomFormat())
+
 	return message, nil
 }
 
