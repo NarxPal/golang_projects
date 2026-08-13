@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -12,6 +13,25 @@ type Task struct {
 	Status      string
 	IsCompleted bool
 	CreatedOn   string
+}
+
+var taskId int = 0
+var taskList []string
+
+func createTask(taskTitle string) []string {
+	taskId++
+	newTask :=
+		Task{
+			Id:          taskId,
+			Title:       taskTitle,
+			Status:      "in-progress",
+			IsCompleted: false,
+		}
+
+	jsonBytes, _ := json.Marshal(newTask)
+	objectAsString := string(jsonBytes)
+	taskList = append(taskList, objectAsString)
+	return taskList
 }
 
 func main() {
@@ -47,7 +67,9 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("task added: %v\n", task)
+		taskData := createTask(task)
+
+		fmt.Printf("task added: %v\n", taskData)
 
 		break
 	}
