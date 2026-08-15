@@ -2,76 +2,119 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type Task struct {
 	Id          int
-	Title       string
+	Task        string
 	Status      string
 	IsCompleted bool
 	CreatedOn   string
 }
 
 var taskId int = 0
-var taskList []string
+var taskList []Task
 
-func createTask(taskTitle string) []string {
+func createTask(taskTitle string) []Task {
 	taskId++
 	newTask :=
 		Task{
 			Id:          taskId,
-			Title:       taskTitle,
+			Task:        taskTitle,
 			Status:      "in-progress",
 			IsCompleted: false,
 		}
-
-	jsonBytes, _ := json.Marshal(newTask)
-	objectAsString := string(jsonBytes)
-	taskList = append(taskList, objectAsString)
+	taskList = append(taskList, newTask)
 	return taskList
 }
 
+func showAllTask() {
+	fmt.Printf("all tasks %v\n", taskList)
+}
+
+func editTaskById(taskId int, scanner *bufio.Scanner) {
+	for i, task := range taskList {
+		if task.Id == taskId {
+			fmt.Println("task title to edit is:")
+			fmt.Printf("%v\n", taskList[i].Task)
+
+			if !scanner.Scan() {
+				break
+			}
+			editedTaskTitle := strings.TrimSpace(scanner.Text())
+			taskList[i].Task = editedTaskTitle
+		}
+	}
+}
+
 func main() {
+
+	scanner := bufio.NewScanner(os.Stdin)
 	for {
 
 		var userInput string
 
-		fmt.Println("type what u want to do for task: add, edit, status, delete, show")
+		fmt.Println(">type what u want to do for task: add, edit, status, delete, show")
 
-		_, err := fmt.Scanln(&userInput)
-		scanner := bufio.NewScanner(os.Stdin)
-
-		if err != nil {
-			fmt.Println("Error reading input:", err)
-			return
+		if !scanner.Scan() {
+			break
 		}
+		userInput = strings.TrimSpace(scanner.Text())
+
+		fmt.Print("\033[1A\033[2K") // clear user input after "enter" is pressed
 
 		// if userInput doesn't match the suggested input than let the user re-type
 		if userInput != "add" && userInput != "edit" && userInput != "status" && userInput != "delete" && userInput != "show" {
 			fmt.Println("Invalid command!")
 			continue
 		}
-		fmt.Println("add task:")
 
-		if !scanner.Scan() {
-			break
+		if userInput == "add" {
+
+			fmt.Println("add task:")
+
+			if !scanner.Scan() {
+				break
+			}
+
+			task := strings.TrimSpace(scanner.Text())
+
+			if task == "" {
+				fmt.Println(">You didn't type anything, plz try again")
+				continue
+			}
+
+			createTask(task)
+
+		} else if userInput == "show" {
+			showAllTask()
+		} else if userInput == "edit" {
+			fmt.Println("enter taskId to edit task:")
+
+			if !scanner.Scan() {
+				break
+			}
+
+			taskId := strings.TrimSpace(scanner.Text())
+			id, err := strconv.Atoi(taskId)
+
+			if err != nil {
+				fmt.Printf("no such id- %v present\n", id)
+			} else {
+				editTaskById(id, scanner)
+			}
+
+		} else if userInput == "delete" {
+
+		} else {
+			// show status of task, by asking user's which task status they want
+
 		}
 
-		task := scanner.Text()
-
-		if task == "" {
-			fmt.Println("You didn't type anything, plz try again")
-			continue
-		}
-
-		taskData := createTask(task)
-
-		fmt.Printf("task added: %v\n", taskData)
-
-		break
 	}
 
 }
