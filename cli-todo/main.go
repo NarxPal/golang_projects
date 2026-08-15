@@ -51,6 +51,14 @@ func editTaskById(taskId int, scanner *bufio.Scanner) {
 	}
 }
 
+func deleteTaskById(taskId int) {
+	for i, task := range taskList {
+		if task.Id == taskId {
+			taskList = append(taskList[:i], taskList[i+1:]...)
+		}
+	}
+}
+
 func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -109,7 +117,19 @@ func main() {
 			}
 
 		} else if userInput == "delete" {
+			fmt.Println("enter taskId to delete task:")
 
+			if !scanner.Scan() {
+				break
+			}
+			taskId := strings.TrimSpace(scanner.Text())
+			id, err := strconv.Atoi(taskId)
+
+			if err != nil {
+				fmt.Printf("no such id- %v present\n", id)
+			} else {
+				deleteTaskById(id)
+			}
 		} else {
 			// show status of task, by asking user's which task status they want
 
