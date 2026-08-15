@@ -11,7 +11,6 @@ import (
 type Task struct {
 	Id          int
 	Task        string
-	Status      string
 	IsCompleted bool
 	CreatedOn   string
 }
@@ -25,7 +24,6 @@ func createTask(taskTitle string) []Task {
 		Task{
 			Id:          taskId,
 			Task:        taskTitle,
-			Status:      "in-progress",
 			IsCompleted: false,
 		}
 	taskList = append(taskList, newTask)
@@ -33,7 +31,32 @@ func createTask(taskTitle string) []Task {
 }
 
 func showAllTask() {
-	fmt.Printf("all tasks %v\n", taskList)
+	if len(taskList) == 0 {
+		fmt.Println("No tasks found.")
+		return
+	}
+
+	fmt.Println("\nTasks:")
+	fmt.Println("────────────────────────────────────────────────────────────")
+
+	for _, task := range taskList {
+		icon := "☐"
+		status := "incomplete"
+
+		if task.IsCompleted {
+			icon = "✓"
+			status = "completed"
+		}
+
+		fmt.Printf("%s  ID: %-3d  Task: %-30s  Status: %s\n",
+			icon,
+			task.Id,
+			task.Task,
+			status,
+		)
+	}
+
+	fmt.Println("────────────────────────────────────────────────────────────")
 }
 
 func editTaskById(taskId int, scanner *bufio.Scanner) {
@@ -57,6 +80,15 @@ func deleteTaskById(taskId int) {
 			taskList = append(taskList[:i], taskList[i+1:]...)
 		}
 	}
+}
+
+func toggleIsCompleted(taskId int) {
+	for i, task := range taskList {
+		if task.Id == taskId {
+			taskList[i].IsCompleted = !taskList[i].IsCompleted
+		}
+	}
+
 }
 
 func main() {
@@ -133,6 +165,20 @@ func main() {
 		} else {
 			// show status of task, by asking user's which task status they want
 
+			fmt.Println("enter taskId to toggle isCompleted:")
+
+			if !scanner.Scan() {
+				break
+			}
+
+			taskId := strings.TrimSpace(scanner.Text())
+			id, err := strconv.Atoi(taskId)
+
+			if err != nil {
+				fmt.Printf("no such id- %v present\n", id)
+			} else {
+				toggleIsCompleted(id)
+			}
 		}
 
 	}
