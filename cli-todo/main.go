@@ -2,8 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -19,7 +22,13 @@ var taskId int = 0
 var taskList []Task
 
 func createTask(taskTitle string) []Task {
-	taskId++
+	for _, task := range taskList {
+		if task.Id > taskId {
+			taskId = task.Id
+		}
+	}
+
+	taskId++ // increase by one
 	newTask :=
 		Task{
 			Id:          taskId,
@@ -91,8 +100,54 @@ func toggleIsCompleted(taskId int) {
 
 }
 
-func main() {
+func getTaskFilePath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
 
+	return filepath.Join(home, ".local", "share", "todo", "tasks.json")
+}
+
+func saveTasks() {
+	path := getTaskFilePath()
+
+	MkdirErr := os.MkdirAll(filepath.Dir(path), 0755)
+	if MkdirErr != nil {
+		fmt.Println("Error creating directory:", MkdirErr)
+		return
+	}
+	jsonBytes, jsonBytesErr := json.MarshalIndent(taskList, "", "    ")
+	if jsonBytesErr != nil {
+		log.Fatalf("Error parsing JSON: %v", jsonBytesErr)
+	}
+	err := os.WriteFile(path, jsonBytes, 0644)
+
+	if err != nil {
+		fmt.Println("Error writing JSON file:", err)
+		return
+	}
+
+}
+
+func loadTasks() {
+	path := getTaskFilePath()
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+
+	jsonErr := json.Unmarshal(data, &taskList)
+
+	if jsonErr != nil {
+		log.Fatalf("Error parsing JSON: %v", jsonErr)
+	}
+
+}
+
+func main() {
+	loadTasks()
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 
@@ -129,6 +184,7 @@ func main() {
 			}
 
 			createTask(task)
+			saveTasks()
 
 		} else if userInput == "show" {
 			showAllTask()
@@ -146,6 +202,7 @@ func main() {
 				fmt.Printf("no such id- %v present\n", id)
 			} else {
 				editTaskById(id, scanner)
+				saveTasks() // save to disk file
 			}
 
 		} else if userInput == "delete" {
@@ -161,6 +218,7 @@ func main() {
 				fmt.Printf("no such id- %v present\n", id)
 			} else {
 				deleteTaskById(id)
+				saveTasks() // save to disk file
 			}
 		} else {
 			// show status of task, by asking user's which task status they want
@@ -178,6 +236,7 @@ func main() {
 				fmt.Printf("no such id- %v present\n", id)
 			} else {
 				toggleIsCompleted(id)
+				saveTasks() // save to disk file
 			}
 		}
 
