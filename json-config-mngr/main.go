@@ -57,15 +57,37 @@ func main() {
 		return
 	}
 	jsonKey := inputWords[1]
-	fmt.Printf("json key %v\n", jsonKey)
+	var jsonValue any
+	var nestedMap map[string]any
+	var ok bool
 
-	// bring value from json using jsonKey
-	jsonValue, ok := config[jsonKey]
-	if ok {
-		fmt.Printf("json vlaue %v\n", jsonValue)
+	if strings.Contains(jsonKey, ".") {
+		parts := strings.Split(jsonKey, ".")
+		fmt.Printf("parts : %v\n", parts)
+		jsonPart0Val, exists := config[parts[0]]
+		if !exists {
+			fmt.Printf("key %s not found\n", parts[0])
+			return
+		}
+
+		nestedMap, ok = jsonPart0Val.(map[string]any)
+		if !ok {
+			fmt.Printf("%s is not a nested object\n", parts[0])
+			return
+		}
+
+		jsonValue, exists = nestedMap[parts[1]]
+		if !exists {
+			fmt.Printf("key %s not found inside %s\n", parts[1], parts[0])
+			return
+		}
+
+		fmt.Printf("json value: %v\n", jsonValue)
+
 	} else {
-		fmt.Printf("no '%v' key found in json\n", jsonKey)
-		return
+		jsonValue, ok = config[jsonKey]
+
+		fmt.Printf("json value: %v\n", jsonValue)
 	}
 
 }
