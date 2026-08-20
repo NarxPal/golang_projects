@@ -1,0 +1,26 @@
+2026-08-21 09:00:12 INFO Server started on port 8080
+2026-08-21 09:00:15 INFO Database connection established
+2026-08-21 09:01:03 INFO GET /api/users 200
+2026-08-21 09:01:10 INFO POST /api/login 200
+2026-08-21 09:02:45 WARNING Slow response detected: /api/products took 1200ms
+2026-08-21 09:03:21 ERROR Database connection failed
+2026-08-21 09:03:25 INFO Retrying database connection
+2026-08-21 09:03:30 INFO Database connection established
+2026-08-21 09:04:12 INFO GET /api/products 200
+2026-08-21 09:05:44 ERROR Invalid authentication token
+2026-08-21 09:06:02 INFO GET /api/profile 401
+2026-08-21 09:06:30 WARNING High memory usage: 82%
+2026-08-21 09:07:15 INFO POST /api/orders 201
+2026-08-21 09:08:41 ERROR Payment service unavailable
+2026-08-21 09:08:50 INFO Retrying payment request
+2026-08-21 09:09:20 INFO Payment request completed
+2026-08-21 09:10:05 WARNING Slow response detected: /api/orders took 950ms
+2026-08-21 09:11:33 ERROR Database connection failed
+2026-08-21 09:11:40 ERROR Database connection failed
+2026-08-21 09:12:10 INFO Database connection established
+2026-08-21 09:13:22 INFO GET /api/users 200
+2026-08-21 09:14:18 INFO GET /api/products 200
+2026-08-21 09:15:40 WARNING Disk usage: 88%
+2026-08-21 09:16:55 ERROR File upload failed
+2026-08-21 09:17:10 INFO GET /health 200
+2026-08-21 09:18:30 INFO Server running normally
