@@ -7,6 +7,7 @@ import (
 	"math/rand/v2"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type ShortUrl struct {
@@ -20,7 +21,21 @@ var urlStore = make(map[string]string)
 var idStore = make(map[string]string)
 
 func homeHandler(writer http.ResponseWriter, requestData *http.Request) {
-	fmt.Fprintf(writer, "http server")
+	path := requestData.URL.Path
+	if path == "/" {
+		fmt.Fprintf(writer, "http server")
+		return
+	}
+	shortId := strings.TrimPrefix(path, "/")
+	fmt.Printf("url.path check %v\n", shortId)
+
+	urlPath, exists := urlStore[shortId]
+	if !exists {
+		http.Error(writer, "url for id not found", http.StatusNotFound)
+	}
+
+	fmt.Printf("urlpath check %v\n", urlPath)
+	http.Redirect(writer, requestData, urlPath, http.StatusFound)
 }
 
 func healthHandler(writer http.ResponseWriter, requestData *http.Request) {
@@ -62,6 +77,7 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//  map the url wrt id using idStore
 	shortId, exists := idStore[fetchUrl.URL]
 
 	if exists {
@@ -78,8 +94,6 @@ func shortenHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("map check %v\n", urlStore)
 	fmt.Printf("u check %v\n", u.Scheme)
 	fmt.Fprint(w, " post req recieved")
-
-	// after creating a short id , just map the id wrt url
 
 }
 
